@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar 360 - Plataforma de Tutoría</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f8f9fa">
+    
+    <!-- Firebase SDK Modules -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <!-- App Header & Navigation -->
+    <header class="app-header" id="app-header" style="display: none;">
+        <div class="app-brand">Radar 360</div>
+        <button id="logout-btn" class="logout-link" onclick="window.AuthTools.handleLogout()">Cerrar Sesión</button>
+    </header>
+
+    <!-- Global Monitoring Banner -->
+    <div id="monitoring-banner" class="banner hidden">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        ATENCIÓN: ESTA CONVERSACIÓN ESTÁ SIENDO SUPERVISADA EN TIEMPO REAL POR SEGURIDAD
+    </div>
+
+    <main id="app">
+        <!-- 1. Login View -->
+        <div id="view-login" class="view active">
+            <div class="login-screen">
+                <div class="login-icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                </div>
+                <h1 class="login-title">Radar 360</h1>
+                <p class="login-subtitle">Tu santuario de aprendizaje te espera.</p>
+                
+                <div class="login-card">
+                    <form id="login-form">
+                        <label class="input-label">Correo electrónico</label>
+                        <input type="email" id="email" placeholder="nombre@ejemplo.com" required>
+                        
+                        <label class="input-label">Contraseña</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <a href="#" style="color: var(--primary-blue); font-size: 0.85rem; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Entrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Student Dashboard -->
+        <div id="view-student" class="view hidden">
+            <div class="container">
+                <h2 class="greeting">Hola, Estudiante.</h2>
+                <p class="greeting-subtitle">Es el momento perfecto para seguir aprendiendo.</p>
+                
+                <div id="active-student-section">
+                    <!-- Controlled via JS -->
+                </div>
+
+                <!-- Info summary -->
+                <div class="card-section" style="margin-top: 24px;">
+                    <div style="display: flex; align-items: center;">
+                        <div class="user-avatar-placeholder">E</div>
+                        <div>
+                            <div style="font-weight: 700;">Perfil de Estudiante</div>
+                            <div style="font-size: 0.8rem; color: var(--text-gray);">Educación Secundaria</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Tutor Dashboard -->
+        <div id="view-tutor" class="view hidden">
+            <div class="container">
+                <h2 class="greeting" style="font-size: 1.8rem;">Panel del Tutor</h2>
+                <p class="greeting-subtitle">Gestiona tus sesiones y estudiantes en tiempo real.</p>
+                
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <span style="font-size: 0.9rem; font-weight: 600;">Mi estado:</span>
+                    <button id="toggle-tutor-state" style="background-color: var(--primary-blue); color: white; border: none; padding: 6px 16px; border-radius: 12px; font-weight: 600; cursor: pointer;">Disponible</button>
+                </div>
+
+                <h3 style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Estudiantes en espera
+                    </span>
+                    <span style="background-color: #a7f3d0; color: #065f46; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 12px;">EN COLA</span>
+                </h3>
+
+                <div id="tutor-queue-list">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Admin Dashboard -->
+        <div id="view-admin" class="view hidden">
+            <div class="container">
+                <h2 class="greeting" style="font-size: 1.8rem;">Panel de Supervisión</h2>
+                <p class="greeting-subtitle">Monitoreo de interacciones activas y controles de privacidad.</p>
+
+                <div class="admin-grid">
+                    <div class="admin-stat">
+                        <h4>Chats Activos</h4>
+                        <div class="number text-dark">0</div>
+                    </div>
+                    <div class="admin-stat">
+                        <h4 style="color: var(--danger-color);">Alertas</h4>
+                        <div class="number" style="color: var(--danger-color);">0</div>
+                    </div>
+                </div>
+
+                <div id="admin-rooms-list">
+                    <!-- Rendered via JS -->
+                    <div style="text-align: center; color: var(--text-light); padding: 40px 0;">No hay sesiones activas.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Chat View -->
+        <div id="view-chat" class="view hidden" style="padding: 0;">
+            <div class="chat-container">
+                <div style="padding: 16px 20px; background-color: white; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center;">
+                    <div class="user-avatar-placeholder" style="width: 40px; height: 40px;">T</div>
+                    <div style="flex:1;">
+                        <div style="font-weight: 700; font-size: 1rem;">Sala de Tutoría</div>
+                        <div style="font-size: 0.75rem; color: var(--text-gray);">Sesión activa 1-a-1</div>
+                    </div>
+                    <button id="end-session-btn" class="btn-primary" style="width: auto; padding: 8px 16px; background-color: var(--danger-color); font-size: 0.85rem;" onclick="window.AppTools.switchView('view-tutor')">Finalizar</button>
+                </div>
+                
+                <div id="chat-messages" class="chat-messages">
+                    <div style="text-align: center; font-size: 0.75rem; color: var(--text-light); margin: 20px 0;">Inicio de la sesión supervisada</div>
+                </div>
+                
+                <form id="chat-form" class="chat-input">
+                    <input type="text" id="message-input" placeholder="Escribe tu respuesta aquí..." autocomplete="off" maxlength="2000">
+                    <button type="submit" class="btn-send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Mobile -->
+        <nav id="bottom-nav" class="bottom-nav hidden">
+            <button class="nav-item active" onclick="window.AppTools.switchView('view-student')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                Clases
+            </button>
+            <button class="nav-item" onclick="window.AppTools.switchView('view-chat')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </button>
+            <button class="nav-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Perfil
+            </button>
+        </nav>
+    </main>
+
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/queue.js"></script>
+    <script type="module" src="js/chat.js"></script>
+    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

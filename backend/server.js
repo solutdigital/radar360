@@ -15,8 +15,8 @@ const fs = require('fs');
 const path = require('path');
 const messagesRoute = require('./routes/messages');
 
-// Subir todo el frontend en la ruta principal ("/")
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve frontend from the /public subdirectory (co-located within the backend deploy)
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/messages', messagesRoute);
 
 const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
