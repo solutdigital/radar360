@@ -4,7 +4,7 @@ import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCQPlilQuZqvl-sLAqRHSL54hOyDbwQFzo",
+    apiKey: "AIzaSyCQPlilQuZqvl-sLAqRHSLs4hOyDbwQFzo",
     authDomain: "radar-academico-360.firebaseapp.com",
     projectId: "radar-academico-360",
     storageBucket: "radar-academico-360.firebasestorage.app",
