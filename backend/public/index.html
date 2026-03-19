@@ -20,7 +20,7 @@
     </script>
 </head>
 <body>
-    <!-- App Header & Navigation -->
+    <!-- App Header -->
     <header class="app-header" id="app-header" style="display: none;">
         <div class="app-brand">Radar 360</div>
         <button id="logout-btn" class="logout-link" onclick="window.AuthTools.handleLogout()">Cerrar Sesión</button>
@@ -50,10 +50,6 @@
                         <label class="input-label">Contraseña</label>
                         <input type="password" id="password" placeholder="••••••••" required>
                         
-                        <div style="text-align: center; margin-bottom: 24px;">
-                            <a href="#" style="color: var(--primary-blue); font-size: 0.85rem; text-decoration: none;">¿Olvidaste tu contraseña?</a>
-                        </div>
-                        
                         <button type="submit" class="btn-primary">Entrar</button>
                     </form>
                 </div>
@@ -63,22 +59,11 @@
         <!-- 2. Student Dashboard -->
         <div id="view-student" class="view hidden">
             <div class="container">
-                <h2 class="greeting">Hola, Estudiante.</h2>
-                <p class="greeting-subtitle">Es el momento perfecto para seguir aprendiendo.</p>
+                <h2 class="greeting">Hola, <span id="student-name-display">Estudiante</span>.</h2>
+                <p class="greeting-subtitle">Aquí puedes chatear con tu tutor asignado.</p>
                 
-                <div id="active-student-section">
-                    <!-- Controlled via JS -->
-                </div>
-
-                <!-- Info summary -->
-                <div class="card-section" style="margin-top: 24px;">
-                    <div style="display: flex; align-items: center;">
-                        <div class="user-avatar-placeholder">E</div>
-                        <div>
-                            <div style="font-weight: 700;">Perfil de Estudiante</div>
-                            <div style="font-size: 0.8rem; color: var(--text-gray);">Educación Secundaria</div>
-                        </div>
-                    </div>
+                <div id="student-tutor-section">
+                    <!-- Rendered via JS -->
                 </div>
             </div>
         </div>
@@ -86,23 +71,10 @@
         <!-- 3. Tutor Dashboard -->
         <div id="view-tutor" class="view hidden">
             <div class="container">
-                <h2 class="greeting" style="font-size: 1.8rem;">Panel del Tutor</h2>
-                <p class="greeting-subtitle">Gestiona tus sesiones y estudiantes en tiempo real.</p>
+                <h2 class="greeting" style="font-size: 1.8rem;">Mis Estudiantes</h2>
+                <p class="greeting-subtitle">Selecciona un estudiante para abrir su sala de chat.</p>
                 
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                    <span style="font-size: 0.9rem; font-weight: 600;">Mi estado:</span>
-                    <button id="toggle-tutor-state" style="background-color: var(--primary-blue); color: white; border: none; padding: 6px 16px; border-radius: 12px; font-weight: 600; cursor: pointer;">Disponible</button>
-                </div>
-
-                <h3 style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Estudiantes en espera
-                    </span>
-                    <span style="background-color: #a7f3d0; color: #065f46; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 12px;">EN COLA</span>
-                </h3>
-
-                <div id="tutor-queue-list">
+                <div id="tutor-students-list">
                     <!-- Rendered via JS -->
                 </div>
             </div>
@@ -111,24 +83,70 @@
         <!-- 4. Admin Dashboard -->
         <div id="view-admin" class="view hidden">
             <div class="container">
-                <h2 class="greeting" style="font-size: 1.8rem;">Panel de Supervisión</h2>
-                <p class="greeting-subtitle">Monitoreo de interacciones activas y controles de privacidad.</p>
 
-                <div class="admin-grid">
-                    <div class="admin-stat">
-                        <h4>Chats Activos</h4>
-                        <div class="number text-dark">0</div>
+                <!-- Admin Tab Navigation -->
+                <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--border-soft); padding-bottom: 0;">
+                    <button class="admin-tab active" id="tab-supervision" onclick="window.AdminTools.showTab('supervision')">Supervisión</button>
+                    <button class="admin-tab" id="tab-assignments" onclick="window.AdminTools.showTab('assignments')">Asignaciones</button>
+                    <button class="admin-tab" id="tab-users" onclick="window.AdminTools.showTab('users')">Crear Usuario</button>
+                </div>
+
+                <!-- Tab: Supervision -->
+                <div id="admin-tab-supervision">
+                    <h2 class="greeting" style="font-size: 1.5rem;">Panel de Supervisión</h2>
+                    <p class="greeting-subtitle">Monitoreo de interacciones activas.</p>
+                    <div class="admin-grid">
+                        <div class="admin-stat">
+                            <h4>Chats Activos</h4>
+                            <div class="number text-dark" id="stat-active-chats">0</div>
+                        </div>
+                        <div class="admin-stat">
+                            <h4 style="color: var(--danger-color);">Alertas</h4>
+                            <div class="number" style="color: var(--danger-color);">0</div>
+                        </div>
                     </div>
-                    <div class="admin-stat">
-                        <h4 style="color: var(--danger-color);">Alertas</h4>
-                        <div class="number" style="color: var(--danger-color);">0</div>
+                    <div id="admin-rooms-list">
+                        <div style="text-align: center; color: var(--text-light); padding: 40px 0;">No hay sesiones activas.</div>
                     </div>
                 </div>
 
-                <div id="admin-rooms-list">
-                    <!-- Rendered via JS -->
-                    <div style="text-align: center; color: var(--text-light); padding: 40px 0;">No hay sesiones activas.</div>
+                <!-- Tab: Assignments -->
+                <div id="admin-tab-assignments" style="display:none;">
+                    <h2 class="greeting" style="font-size: 1.5rem;">Asignaciones</h2>
+                    <p class="greeting-subtitle">Asigna un tutor a cada estudiante para crear su sala de chat.</p>
+                    <div id="assignments-list">
+                        <!-- Rendered via JS -->
+                    </div>
                 </div>
+
+                <!-- Tab: Create User -->
+                <div id="admin-tab-users" style="display:none;">
+                    <h2 class="greeting" style="font-size: 1.5rem;">Crear Nuevo Usuario</h2>
+                    <p class="greeting-subtitle">Los usuarios se crean con acceso inmediato a la plataforma.</p>
+                    <div class="login-card" style="max-width: 480px; margin: 0;">
+                        <form id="create-user-form">
+                            <label class="input-label">Nombre Completo</label>
+                            <input type="text" id="new-user-name" placeholder="Ej: Juan García" required>
+                            
+                            <label class="input-label">Correo Electrónico</label>
+                            <input type="email" id="new-user-email" placeholder="correo@ejemplo.com" required>
+                            
+                            <label class="input-label">Contraseña temporal</label>
+                            <input type="password" id="new-user-password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            
+                            <label class="input-label">Rol</label>
+                            <select id="new-user-role" style="width:100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-soft); font-size: 0.95rem; margin-bottom: 20px; background: var(--bg-input); color: var(--text-dark);">
+                                <option value="STUDENT">Estudiante</option>
+                                <option value="TUTOR">Tutor</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select>
+                            
+                            <button type="submit" class="btn-primary" id="create-user-btn">Crear Usuario</button>
+                            <p id="create-user-status" style="text-align: center; margin-top: 12px; font-size: 0.85rem; color: var(--text-gray);"></p>
+                        </form>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -136,12 +154,11 @@
         <div id="view-chat" class="view hidden" style="padding: 0;">
             <div class="chat-container">
                 <div style="padding: 16px 20px; background-color: white; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center;">
-                    <div class="user-avatar-placeholder" style="width: 40px; height: 40px;">T</div>
+                    <button onclick="window.ChatTools.goBack()" style="background:none; border:none; cursor:pointer; margin-right: 12px; color: var(--primary-blue); font-size: 1.1rem;">← Volver</button>
                     <div style="flex:1;">
-                        <div style="font-weight: 700; font-size: 1rem;">Sala de Tutoría</div>
-                        <div style="font-size: 0.75rem; color: var(--text-gray);">Sesión activa 1-a-1</div>
+                        <div style="font-weight: 700; font-size: 1rem;" id="chat-room-title">Sala de Tutoría</div>
+                        <div style="font-size: 0.75rem; color: var(--text-gray);">Sesión supervisada 1-a-1</div>
                     </div>
-                    <button id="end-session-btn" class="btn-primary" style="width: auto; padding: 8px 16px; background-color: var(--danger-color); font-size: 0.85rem;" onclick="window.AppTools.switchView('view-tutor')">Finalizar</button>
                 </div>
                 
                 <div id="chat-messages" class="chat-messages">
@@ -154,28 +171,13 @@
                 </form>
             </div>
         </div>
-
-        <!-- Bottom Navigation Mobile -->
-        <nav id="bottom-nav" class="bottom-nav hidden">
-            <button class="nav-item active" onclick="window.AppTools.switchView('view-student')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-                Clases
-            </button>
-            <button class="nav-item" onclick="window.AppTools.switchView('view-chat')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Chat
-            </button>
-            <button class="nav-item">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                Perfil
-            </button>
-        </nav>
     </main>
 
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/app.js"></script>
     <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/queue.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
     <script type="module" src="js/chat.js"></script>
     <script type="module" src="js/admin.js"></script>
-    <script type="module" src="js/app.js"></script>
 </body>
 </html>

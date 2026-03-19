@@ -14,10 +14,12 @@ app.use(express.json());
 const fs = require('fs');
 const path = require('path');
 const messagesRoute = require('./routes/messages');
+const usersRoute = require('./routes/users');
 
 // Serve frontend from the /public subdirectory (co-located within the backend deploy)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/messages', messagesRoute);
+app.use('/api/users', usersRoute);
 
 const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
 

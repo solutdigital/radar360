@@ -1,6 +1,5 @@
-// chat.js
 import { db } from "./firebase-config.js";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
 import { userState } from "./auth.js";
 
 const messageInput = document.getElementById('message-input');
@@ -8,10 +7,20 @@ const chatForm = document.getElementById('chat-form');
 const chatMessages = document.getElementById('chat-messages');
 
 let currentRoomId = null;
+let isReadOnly = false;
 let unsubscribeMessages = null;
+
+const goBack = () => {
+    if (userState.role === 'TUTOR') window.AppTools.switchView('view-tutor');
+    else if (userState.role === 'ADMIN') window.AppTools.switchView('view-admin');
+    else window.AppTools.switchView('view-student');
+};
+
+window.ChatTools = { goBack };
 
 window.addEventListener('roomJoined', (e) => {
     currentRoomId = e.detail.roomId;
+    isReadOnly = e.detail.readOnly || false;
     if (unsubscribeMessages) unsubscribeMessages();
     
     chatMessages.innerHTML = `<div style="text-align: center; font-size: 0.75rem; color: var(--text-light); margin: 20px 0;">Inicio de la sesión supervisada</div>`;
