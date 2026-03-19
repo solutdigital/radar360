@@ -11,12 +11,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-const messagesRoute = require('./routes/messages');
-app.use('/api/messages', messagesRoute);
-
 const fs = require('fs');
 const path = require('path');
+const messagesRoute = require('./routes/messages');
+
+// Subir todo el frontend en la ruta principal ("/")
+app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/api/messages', messagesRoute);
+
 const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
 
 try {

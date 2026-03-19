@@ -49,7 +49,7 @@ if(chatForm) {
         
         // We send to backend API to apply content filtering
         try {
-            const response = await fetch('http://localhost:8080/api/messages/send', {
+            const response = await fetch('/api/messages/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
